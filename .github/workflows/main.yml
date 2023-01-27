@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-latest-stable:
     runs-on: ubuntu-20.04
 
     steps:
@@ -36,6 +36,37 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang 
+
+
+      - name: Rust version
+        run: rustc --version --verbose
+
+      - name: Build
+        run: cargo test --release
+
+  build-rust-1_66:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+          lfs: true
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.19"
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.66
 
       - name: Install dependencies
         run: |
