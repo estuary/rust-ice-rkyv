@@ -1,0 +1,50 @@
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push
+# or pull request events, but only for the primary branch.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_CACHE_VERSION: 0.8.2
+  RUSTFLAGS: "-C link-arg=-fuse-ld=lld"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+          lfs: true
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.19"
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang 
+
+
+      - name: Rust version
+        run: rustc --version --verbose
+
+      - name: Build
+        run: cargo test --release

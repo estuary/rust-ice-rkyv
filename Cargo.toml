@@ -1,0 +1,17 @@
+[package]
+name = "rust-ice-rkyv"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rkyv = { version = "0.7", features = ["archive_le"] }
+bumpalo = { version = "3.11", features = ["collections"] }
+
+[lib]
+crate-type=["lib"]
+
+[profile.release]
+incremental = true
+debug = 0          # Set this to 1 or 2 to get more useful backtraces in debugger.
